@@ -1,0 +1,44 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Environment variables (Crucial for security)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Build and distribution
+dist/
+build/
+out/
+
+# Debugging and logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs
+*.log
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# IDE/Editor configs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage folders (for testing)
+coverage/
+.nyc_output/
+
+# Optional: Local database files
+*.db
+*.sqlite
