@@ -60,7 +60,7 @@ export const uploadDocument = async (req, res, next) => {
   }
 }
 
-//Helper function to preocess PDF
+//Helper function to process PDF
 const processPDF = async (documentId, filePath) => {
   try {
     const { text } = await extractTextFromPDF(filePath);
@@ -105,15 +105,100 @@ export const getDocuments = async (req, res, next) => {
           foreignField: 'documentId',
           as: 'quizzes'
         }
+      },
+      {
+        $addFields: {
+          flashcardCount: { $size: '$flashcardSets' },
+          quizCount: { $size: '$quizzes' }
+        }
+      },
+      {
+        $project: {
+          extractedText: 0,
+          chunks: 0,
+          flashcardSets: 0,
+          quizzes: 0
+        }
+      },
+      {
+        $sort: {
+          uploadDate: -1,
+        }
       }
-    ])
+    ]);
+
+    res.status(200).json({
+      success: true,
+      count: documents.length,
+      date: documents
+    })
   } catch (error) {
     next(error);
   }
 }
 
-export const getDocument = async (req, res, next) => { }
+export const getDocument = async (req, res, next) => {
+  try {
+    const document = await Document.findOne({
+      _id: req.params.id,
+      userId: req.user._id
+    });
+    if (!document) {
+      return res.status(404).json({
+        success: false,
+        error: 'Document not found',
+        statusCode: 404
+      });
+    }
 
-export const deleteDocuments = async (req, res, next) => { }
+    //get counts of associated flashcards and quizzes
+    const flashcardCount = await FlashCard.countDocuments({ documentId: document._id, userId: req.user._id });
+    const quizCount = await Quiz.countDocuments({ documentId: document._id, userId: req.user._id });
 
-export const updateDocuments = async (req, res, next) => { }
+    //upload last accessed
+    document.lastAccessed = Date.now();
+    await document.save();
+
+    //Combine document data with counts
+    const documentData = document.toObject();
+    documentData.flashcardCount = flashcardCount;
+    documentData.quizCount = quizCount;
+
+    res.status(200).json({
+      success: true,
+      data: documentData
+    })
+  } catch (error) {
+    next(error);
+  }
+}
+
+export const deleteDocument = async (req, res, next) => {
+  try {
+    const document = await Document.findOne({
+      _id: req.params.id,
+      userId: req.user._id
+    });
+
+    if (!document) {
+      return res.status(404).json({
+        sucess: false,
+        error: 'Document not found',
+        statusCode: 404
+      });
+    }
+
+    //delete file from filesystem
+    await fs.unlink(document.filePath).catch(() => { });
+
+    //delete document
+    await document.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: 'Document deleted successfully'
+    });
+  } catch (error) {
+    next(error);
+  }
+}

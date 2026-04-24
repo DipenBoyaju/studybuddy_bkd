@@ -21,7 +21,7 @@ export const chunkText = (text, chunkSize = 500, overlap = 50) => {
   let currentWordCount = 0;
   let chunkIndex = 0;
 
-  for (const paragraph of paragraph) {
+  for (const paragraph of paragraphs) {
     const paragraphWords = paragraph.trim().split(/\s+/);
     const paragraphWordCount = paragraphWords.length;
 

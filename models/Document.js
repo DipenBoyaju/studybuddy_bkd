@@ -43,7 +43,7 @@ const documentSchema = new mongoose.Schema({
   },
   lastAccessed: {
     type: Date,
-    default: date.now
+    default: Date.now
   },
   states: {
     type: String,

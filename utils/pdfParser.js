@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { PDFparse } from "pdf-parse";
+import { PDFParse } from "pdf-parse";
 
 
 export const extractTextFromPDF = async (filePath) => {
