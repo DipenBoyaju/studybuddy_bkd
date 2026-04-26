@@ -24,7 +24,12 @@ const quizSchema = new mongoose.Schema({
     options: {
       type: [String],
       required: true,
-      validate: [array => array === 4, "Must have exactly 4 options"]
+      validate: {
+        validator: function (v) {
+          return v.length === 4;
+        },
+        message: "A quiz question must have exactly 4 options"
+      }
     },
     correctAnswer: {
       type: String,
@@ -71,7 +76,7 @@ const quizSchema = new mongoose.Schema({
     default: null
   }
 }, {
-  timeStamps: true
+  timestamps: true
 });
 
 quizSchema.index({ userId: 1, documentId: 1 });

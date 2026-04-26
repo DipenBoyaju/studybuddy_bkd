@@ -69,7 +69,7 @@ const processPDF = async (documentId, filePath) => {
     const chunks = chunkText(text, 500, 50);
 
     //update document
-    await Document.findByIdAndDelete(documentId, {
+    await Document.findByIdAndUpdate(documentId, {
       extractedText: text,
       chunks: chunks,
       status: 'ready'
@@ -92,7 +92,7 @@ export const getDocuments = async (req, res, next) => {
       },
       {
         $lookup: {
-          from: 'flashcard',
+          from: 'flashcards',
           localField: '_id',
           foreignField: 'documentId',
           as: 'flashcardSets'

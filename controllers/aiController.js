@@ -37,11 +37,11 @@ export const generateFlashcards = async (req, res, next) => {
     );
 
     //save to database
-    const flashcards = await Flashcard.create({
+    const flashcards = await FlashCard.create({
       userId: req.user._id,
       documentId: document._id,
       cards: cards.map(card => ({
-        questions: card.question,
+        question: card.question,
         answer: card.answer,
         difficulty: card.difficulty,
         reviewCount: 0,
@@ -86,7 +86,7 @@ export const generateQuiz = async (req, res, next) => {
     }
 
     //Generate quiz using Gemini
-    const cards = await geminiService.generateQuiz(
+    const generatedQuestions = await geminiService.generateQuiz(
       document.extractedText,
       parseInt(numQuestions)
     );
@@ -96,9 +96,9 @@ export const generateQuiz = async (req, res, next) => {
       userId: req.user._id,
       documentId: document._id,
       title: title || `${document._id} - Quiz`,
-      questions: questions,
-      totalQuestions: questions.length,
-      userAnswer: [],
+      questions: generatedQuestions,
+      totalQuestions: generatedQuestions.length,
+      userAnswers: [],
       score: 0
     });
 
