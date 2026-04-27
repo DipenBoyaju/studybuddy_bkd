@@ -130,7 +130,7 @@ export const getDocuments = async (req, res, next) => {
     res.status(200).json({
       success: true,
       count: documents.length,
-      date: documents
+      data: documents
     })
   } catch (error) {
     next(error);
