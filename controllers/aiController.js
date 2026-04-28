@@ -1,3 +1,4 @@
+import ChatHistory from '../models/ChatHistory.js';
 import Document from '../models/Document.js';
 import FlashCard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
@@ -183,7 +184,7 @@ export const chat = async (req, res, next) => {
       });
     }
 
-    //Find relative chunks
+    //Find relative chunks 
     const relevantChunks = findRelevantChunks(document.chunks, question, 3);
     const chunkIndices = relevantChunks.map(c => c.chunkIndex);
 
@@ -283,7 +284,7 @@ export const explainConcept = async (req, res, next) => {
 
 export const getChatHistory = async (req, res, next) => {
   try {
-    const { documentId } = req.body;
+    const { documentId } = req.params;
 
     if (!documentId) {
       return res.status(400).json({

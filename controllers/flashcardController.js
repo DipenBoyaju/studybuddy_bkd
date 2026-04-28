@@ -117,7 +117,7 @@ export const toggleStarFlashcard = async (req, res, next) => {
 
 export const deleteFlashcardSet = async (req, res, next) => {
   try {
-    const flashcardSet = await Flashcard.findOne({
+    const flashcardSet = await FlashCard.findOne({
       _id: req.params.id,
       userId: req.user._id
     });
