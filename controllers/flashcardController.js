@@ -68,7 +68,7 @@ export const reviewFlashcard = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: flashcards,
+      data: flashcardSet.cards[cardIndex],
       message: 'Flashcard reviewed successfully'
     })
   } catch (error) {

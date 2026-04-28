@@ -96,7 +96,7 @@ export const generateQuiz = async (req, res, next) => {
     const quiz = await Quiz.create({
       userId: req.user._id,
       documentId: document._id,
-      title: title || `${document._id} - Quiz`,
+      title: title || `${document.title} - Quiz`,
       questions: generatedQuestions,
       totalQuestions: generatedQuestions.length,
       userAnswers: [],

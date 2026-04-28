@@ -94,27 +94,41 @@ export const generateQuiz = async (text, numQuestions = 5) => {
     const questionBlocks = generatedText.split('---').filter(q => q.trim());
 
     for (const block of questionBlocks) {
-      const trimmed = line.trim();
-      if (trimmed.startsWith('Q:')) {
-        question = trimmed.substring(2).trim();
-      } else if (trimmed.match(/^0\d:/)) {
-        options.push(trimmed.substring(3).trim())
-      } else if (trimmed.startsWith('C:')) {
-        correctAnswer = trimmed.substring(2).trim();
-      } else if (trimmed.startsWith('E:')) {
-        explanation = trimmed.substring(2).trim();
+      let question = '';
+      let options = [];
+      let correctAnswer = '';
+      let explanation = '';
+      let difficulty = 'medium';
 
-      } else if (trimmed.startsWith('D:')) {
-        const diff = trimmed.substring(2).trim().toLowerCase();
-        if (['easy', 'medium', 'hard'].includes(diff)) {
-          difficulty = diff;
+      const lines = block.split('\n');
+
+      for (const line of lines) {
+        const trimmed = line.trim();
+
+        if (!trimmed) continue;
+
+        if (trimmed.startsWith('Q:')) {
+          question = trimmed.substring(2).trim();
+        } else if (trimmed.match(/^O\d:/)) {
+          options.push(trimmed.substring(3).trim())
+        } else if (trimmed.startsWith('C:')) {
+          correctAnswer = trimmed.substring(2).trim();
+        } else if (trimmed.startsWith('E:')) {
+          explanation = trimmed.substring(2).trim();
+        } else if (trimmed.startsWith('D:')) {
+          const diff = trimmed.substring(2).trim().toLowerCase();
+          if (['easy', 'medium', 'hard'].includes(diff)) {
+            difficulty = diff;
+          }
         }
+      }
+
+      if (question && options.length >= 4 && correctAnswer) {
+        questions.push({ question, options, correctAnswer, explanation, difficulty });
       }
     }
 
-    if (question && options.length === 4 && correctAnswer) {
-      questions.push({ question, options, correctAnswer, explanation, difficulty });
-    }
+    return questions;
   } catch (error) {
     console.error('Gemini API error:', error);
     throw new Error('Failed to generate quiz')
