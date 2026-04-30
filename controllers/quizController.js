@@ -84,17 +84,21 @@ export const submitQuiz = async (req, res, next) => {
       const { questionIndex, selectedAnswer } = answer;
 
       if (questionIndex < quiz.questions.length) {
-        const question = quiz.questions.length[questionIndex];
-        const isCorrect = selectedAnswer === question.correctAnswer;
+        const question = quiz.questions[questionIndex];
 
-        if (isCorrect) correctCount++;
+        if (question) {
+          const isCorrect = selectedAnswer === question.correctAnswer;
 
-        userAnswers.push({
-          questionIndex,
-          selectedAnswer,
-          isCorrect,
-          answeredAt: new Date()
-        });
+          if (isCorrect) correctCount++;
+
+          userAnswers.push({
+            questionIndex,
+            selectedAnswer,
+            isCorrect,
+            answeredAt: new Date()
+          });
+
+        }
       }
     })
 
