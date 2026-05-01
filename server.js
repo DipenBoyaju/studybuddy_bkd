@@ -13,6 +13,9 @@ import flashcardRoutes from './routes/flashcardRoutes.js';
 import aiRoutes from './routes/aiRoutes.js';
 import quizRoutes from './routes/quizRoutes.js';
 import progressRoutes from './routes/progressRoutes.js';
+import { createRouteHandler } from "uploadthing/express";
+import { ourFileRouter } from './config/uploadthing.js';
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +33,10 @@ app.use(
   })
 )
 
+app.use("/api/uploadthing", createRouteHandler({
+  router: ourFileRouter
+}));
+
 app.use(express.json());
 
 //static folder for uploads
@@ -37,6 +44,10 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
   res.send('API is running...');
+});
+
+app.post('/api/ai/sanity-check', (req, res) => {
+  res.json({ message: "The route is reachable", bodyReceived: req.body });
 });
 
 //Routes

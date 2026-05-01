@@ -5,10 +5,16 @@ import { extractTextFromPDF } from '../utils/pdfParser.js';
 import { chunkText } from '../utils/textChunker.js';
 import fs from 'fs/promises';
 import mongoose from 'mongoose';
+import path from 'path';
+import { UTApi } from "uploadthing/server";
+
+const utapi = new UTApi();
 
 export const uploadDocument = async (req, res, next) => {
   try {
-    if (!req.file) {
+    const { title, fileUrl, fileKey, fileSize, fileName } = req.body;
+
+    if (!fileUrl || !fileKey) {
       return res.status(400).json({
         success: false,
         error: 'Please upload a PDF file',
@@ -16,11 +22,9 @@ export const uploadDocument = async (req, res, next) => {
       });
     }
 
-    const { title } = req.body;
-
     if (!title) {
       //delete uploaded file if no title provided
-      await fs.unlink(req.file.path);
+      await utapi.deleteFiles(fileKey);
       return res.status(400).json({
         success: false,
         error: 'Please provide a document title',
@@ -28,22 +32,19 @@ export const uploadDocument = async (req, res, next) => {
       });
     }
 
-    //construct the URL for the uploaded file
-    const baseUrl = `http://localhost:${process.env.PORT || 8000}`;
-    const fileUrl = `${baseUrl}/uploads/documents/${req.file.filename}`;
-
     //create document record
     const document = await Document.create({
       userId: req.user._id,
       title,
-      fileName: req.file.originalname,
-      filePath: fileUrl, ///store the URL instead of local path
-      fileSize: req.file.size,
+      fileName: fileName,
+      filePath: fileUrl,
+      fileKey: fileKey,
+      fileSize: fileSize,
       status: 'processing'
     });
 
     //Process PDF in background (in production, use a queue like bull)
-    processPDF(document._id, req.file.path).catch(err => {
+    processPDF(document._id, fileUrl).catch(err => {
       console.error('PDF processing error:', err);
     });
 
@@ -53,17 +54,14 @@ export const uploadDocument = async (req, res, next) => {
       message: 'Document uploaded successfully, Processing in progress...'
     });
   } catch (error) {
-    if (req.file) {
-      await fs.unlink(req.file.path).catch(() => { });
-    }
     next(error);
   }
 }
 
 //Helper function to process PDF
-const processPDF = async (documentId, filePath) => {
+const processPDF = async (documentId, fileUrl) => {
   try {
-    const { text } = await extractTextFromPDF(filePath);
+    const { text } = await extractTextFromPDF(fileUrl);
 
     //create chunks
     const chunks = chunkText(text, 500, 50);
@@ -188,8 +186,15 @@ export const deleteDocument = async (req, res, next) => {
       });
     }
 
-    //delete file from filesystem
-    await fs.unlink(document.filePath).catch(() => { });
+    // Delete file from UploadThing Cloud using the stored fileKey
+    if (document.fileKey) {
+      try {
+        await utapi.deleteFiles(document.fileKey);
+        console.log('File deleted from UploadThing cloud');
+      } catch (err) {
+        console.error('UploadThing deletion error:', err.message);
+      }
+    }
 
     //delete document
     await document.deleteOne();
