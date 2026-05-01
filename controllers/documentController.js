@@ -1,6 +1,7 @@
 import Document from '../models/Document.js';
 import FlashCard from '../models/Flashcard.js';
 import Quiz from '../models/Quiz.js';
+import ChatHistory from '../models/ChatHistory.js';
 import { extractTextFromPDF } from '../utils/pdfParser.js';
 import { chunkText } from '../utils/textChunker.js';
 import fs from 'fs/promises';
@@ -190,18 +191,23 @@ export const deleteDocument = async (req, res, next) => {
     if (document.fileKey) {
       try {
         await utapi.deleteFiles(document.fileKey);
-        console.log('File deleted from UploadThing cloud');
       } catch (err) {
         console.error('UploadThing deletion error:', err.message);
       }
     }
 
     //delete document
+    await Promise.all([
+      FlashCard.deleteMany({ documentId: document._id }),
+      Quiz.deleteMany({ documentId: document._id }),
+      ChatHistory.deleteMany({ documentId: document._id }),
+    ]);
+
     await document.deleteOne();
 
     res.status(200).json({
       success: true,
-      message: 'Document deleted successfully'
+      message: 'Document and all associated data deleted successfully'
     });
   } catch (error) {
     next(error);
