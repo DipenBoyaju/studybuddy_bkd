@@ -75,6 +75,19 @@ app.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
 
+app.get('/', (req, res) => {
+  // Sending HTML so it looks nice in the browser
+  res.send(`
+    <div style="font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
+      <h1 style="color: #10b981;">🚀 Welcome to Study Buddy API</h1>
+      <p style="color: #64748b;">The server is running smoothly in <b>${process.env.NODE_ENV || 'development'}</b> mode.</p>
+      <div style="margin-top: 20px; padding: 10px; background: #f1f5f9; border-radius: 8px; font-family: monospace;">
+        Status: Online | Version: 1.0.0
+      </div>
+    </div>
+  `);
+});
+
 process.on('unhandledRejection', (err) => {
   console.error(`Error: ${err.message}`);
   process.exit(1);
