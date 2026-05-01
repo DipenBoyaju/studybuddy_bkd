@@ -1,16 +1,14 @@
-import pdf from 'pdf-parse';
+import pdfParse from "pdf-parse/lib/pdf-parse.js";
 
 export const extractTextFromPDF = async (fileUrl) => {
   try {
     const response = await fetch(fileUrl);
-    if (!response.ok) throw new Error('Failed to download PDF from cloud');
+    if (!response.ok) throw new Error("Failed to download PDF from cloud");
 
     const dataBuffer = await response.arrayBuffer();
-
-    // pdf-parse expects a Buffer in Node.js
     const buffer = Buffer.from(dataBuffer);
 
-    const data = await pdf(buffer);
+    const data = await pdfParse(buffer);
 
     return {
       text: data.text,
@@ -19,7 +17,24 @@ export const extractTextFromPDF = async (fileUrl) => {
     };
   } catch (error) {
     console.error("PDF parsing error:", error);
-    // Don't mask the real error; let's see it in the logs
     throw new Error(`Failed to extract text from PDF: ${error.message}`);
   }
-}
+};
+
+// export const extractTextFromPDF = async (filePath) => {
+//   try {
+//     const dataBuffer = await fs.readFile(filePath);
+//     //pdf-parse expects a Unit8Array not a buffer
+//     const parser = new PDFParse(new Uint8Array(dataBuffer));
+//     const data = await parser.getText();
+
+//     return {
+//       text: data.text,
+//       numPages: data.numPages,
+//       info: data.info,
+//     };
+//   } catch (error) {
+//     console.error("PDF parsing error:", error);
+//     throw new Error("Failed to extract text from  PDF");
+//   }
+// };
