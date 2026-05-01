@@ -1,25 +1,31 @@
-import * as pdfParseModule from "pdf-parse";
-
-const pdfParse = pdfParseModule.default || pdfParseModule;
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
 
 export const extractTextFromPDF = async (fileUrl) => {
   try {
     const response = await fetch(fileUrl);
-    if (!response.ok) throw new Error("Failed to download PDF from cloud");
+    if (!response.ok) throw new Error("Failed to download PDF");
 
-    const dataBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(dataBuffer);
+    const arrayBuffer = await response.arrayBuffer();
 
-    const data = await pdfParse(buffer);
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+    let text = "";
+
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+
+      const pageText = content.items.map((item) => item.str).join(" ");
+      text += pageText + "\n";
+    }
 
     return {
-      text: data.text,
-      numPages: data.numpages,
-      info: data.info,
+      text,
+      numPages: pdf.numPages,
     };
   } catch (error) {
     console.error("PDF parsing error:", error);
-    throw new Error(`Failed to extract text from PDF: ${error.message}`);
+    throw new Error(error.message);
   }
 };
 
