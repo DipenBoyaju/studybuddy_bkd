@@ -1,5 +1,4 @@
-import fs from "fs/promises";
-import { PDFParse } from "pdf-parse";
+import pdf from 'pdf-parse';
 
 export const extractTextFromPDF = async (fileUrl) => {
   try {
@@ -8,34 +7,19 @@ export const extractTextFromPDF = async (fileUrl) => {
 
     const dataBuffer = await response.arrayBuffer();
 
-    const parser = new PDFParse(new Uint8Array(dataBuffer));
-    const data = await parser.getText();
+    // pdf-parse expects a Buffer in Node.js
+    const buffer = Buffer.from(dataBuffer);
+
+    const data = await pdf(buffer);
 
     return {
       text: data.text,
-      numPages: data.numPages,
+      numPages: data.numpages,
       info: data.info,
     };
   } catch (error) {
     console.error("PDF parsing error:", error);
-    throw new Error("Failed to extract text from PDF");
+    // Don't mask the real error; let's see it in the logs
+    throw new Error(`Failed to extract text from PDF: ${error.message}`);
   }
 }
-
-// export const extractTextFromPDF = async (filePath) => {
-//   try {
-//     const dataBuffer = await fs.readFile(filePath);
-//     //pdf-parse expects a Unit8Array not a buffer
-//     const parser = new PDFParse(new Uint8Array(dataBuffer));
-//     const data = await parser.getText();
-
-//     return {
-//       text: data.text,
-//       numPages: data.numPages,
-//       info: data.info,
-//     };
-//   } catch (error) {
-//     console.error("PDF parsing error:", error);
-//     throw new Error("Failed to extract text from  PDF");
-//   }
-// };
