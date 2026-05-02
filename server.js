@@ -28,13 +28,13 @@ app.use(
   cors({
     origin: "https://study-buddy-nine-sable.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: [
-      "Content-Type",
-      "Authorization",
-      "x-uploadthing-package",
-      "x-uploadthing-version",
-      "x-uploadthing-request"
-    ],
+    // allowedHeaders: [
+    //   "Content-Type",
+    //   "Authorization",
+    //   "x-uploadthing-package",
+    //   "x-uploadthing-version",
+    //   "x-uploadthing-request"
+    // ],
     credentials: true,
   })
 )
