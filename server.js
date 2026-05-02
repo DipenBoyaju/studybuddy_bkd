@@ -33,14 +33,14 @@ app.use(
   })
 )
 
-app.use("/api/uploadthing", createRouteHandler({
-  router: ourFileRouter
-}));
-
 app.use(express.json());
 
 //static folder for uploads
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/api/uploadthing", createRouteHandler({
+  router: ourFileRouter
+}));
 
 app.get('/', (req, res) => {
   // Sending HTML so it looks nice in the browser
