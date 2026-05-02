@@ -26,7 +26,7 @@ connectDB();
 
 app.use(
   cors({
-    origin: "*",
+    origin: "https://study-buddy-nine-sable.vercel.app/",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
