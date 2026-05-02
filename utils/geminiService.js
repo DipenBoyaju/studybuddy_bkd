@@ -143,11 +143,8 @@ export const generateSummary = async (text) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite-preview",
+      model: "gemini-3-flash-preview",
       contents: prompt,
-      generationConfig: {
-        responseMimeType: "application/json",
-      }
     });
 
     const generatedText = response.text;
@@ -173,11 +170,8 @@ export const chatWithContext = async (question, chunks) => {
 
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-3.1-flash-lite-preview",
+        model: "gemini-3-flash-preview",
         contents: prompt,
-        generationConfig: {
-          responseMimeType: "application/json",
-        }
       });
 
       const generatedText = response.text;
@@ -203,11 +197,8 @@ export const explainConcept = async (concept, context) => {
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-3.1-flash-lite-preview",
+      model: "gemini-3-flash-preview",
       contents: prompt,
-      generationConfig: {
-        responseMimeType: "application/json",
-      }
     });
 
     const generatedText = response.text;

@@ -87,7 +87,15 @@ export const submitQuiz = async (req, res, next) => {
         const question = quiz.questions[questionIndex];
 
         if (question) {
-          const isCorrect = selectedAnswer === question.correctAnswer;
+          const cleanText = (text) => {
+            return text
+              ?.replace(/^O\d+:\s*/, '')
+              .trim()
+              .toLowerCase();
+          };
+
+          const isCorrect =
+            cleanText(selectedAnswer) === cleanText(question.correctAnswer);
 
           if (isCorrect) correctCount++;
 
@@ -114,7 +122,7 @@ export const submitQuiz = async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      date: {
+      data: {
         quizId: quiz._id,
         score,
         correctCount,
@@ -156,12 +164,19 @@ export const getQuizResults = async (req, res, next) => {
     const detailedResults = quiz.questions.map((question, index) => {
       const userAnswer = quiz.userAnswers.find(a => a.questionIndex === index);
 
+      const cleanText = (text) => {
+        return text
+          ?.replace(/^O\d+:\s*/, '')
+          .trim()
+          .toLowerCase();
+      };
+
       return {
         questionIndex: index,
         question: question.question,
         options: question.options,
-        correctAnswer: question.correctAnswer,
-        selectedAnswer: userAnswer?.selectedAnswer || null,
+        correctAnswer: cleanText(question.correctAnswer),
+        selectedAnswer: cleanText(userAnswer?.selectedAnswer || ''),
         isCorrect: userAnswer?.isCorrect || false,
         explanation: question.explanation
       }

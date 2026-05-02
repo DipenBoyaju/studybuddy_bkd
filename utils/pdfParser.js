@@ -1,48 +1,48 @@
-import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
+import dotenv from 'dotenv';
+import { GoogleGenAI } from '@google/genai';
+
+
+dotenv.config();
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export const extractTextFromPDF = async (fileUrl) => {
   try {
     const response = await fetch(fileUrl);
-    if (!response.ok) throw new Error("Failed to download PDF");
+    if (!response.ok) throw new Error('Failed to download PDF');
+    const pdfBuffer = await response.arrayBuffer();
+    const base64Data = Buffer.from(pdfBuffer).toString("base64");
 
-    const arrayBuffer = await response.arrayBuffer();
+    // Use gemini-3.1-flash-preview as 1.5 is deprecated
+    const result = await ai.models.generateContent({
+      model: "gemini-3-flash-preview",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              inlineData: {
+                mimeType: "application/pdf",
+                data: base64Data,
+              },
+            },
+            { text: "Extract all the text from this PDF document. Maintain the logical order of the content." },
+          ],
+        },
+      ],
+    });
 
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    // In the @google/genai library, response text is usually at result.text
+    const text = result.text;
 
-    let text = "";
-
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-
-      const pageText = content.items.map((item) => item.str).join(" ");
-      text += pageText + "\n";
-    }
+    if (!text) throw new Error("Gemini returned empty text.");
 
     return {
-      text,
-      numPages: pdf.numPages,
+      text: text,
+      numPages: "unknown",
     };
   } catch (error) {
-    console.error("PDF parsing error:", error);
-    throw new Error(error.message);
+    console.error('Gemini Extraction Error:', error);
+    throw new Error(`Failed to extract text: ${error.message}`);
   }
 };
-
-// export const extractTextFromPDF = async (filePath) => {
-//   try {
-//     const dataBuffer = await fs.readFile(filePath);
-//     //pdf-parse expects a Unit8Array not a buffer
-//     const parser = new PDFParse(new Uint8Array(dataBuffer));
-//     const data = await parser.getText();
-
-//     return {
-//       text: data.text,
-//       numPages: data.numPages,
-//       info: data.info,
-//     };
-//   } catch (error) {
-//     console.error("PDF parsing error:", error);
-//     throw new Error("Failed to extract text from  PDF");
-//   }
-// };
