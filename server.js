@@ -28,7 +28,13 @@ app.use(
   cors({
     origin: "https://study-buddy-nine-sable.vercel.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "x-uploadthing-package",
+      "x-uploadthing-version",
+      "x-uploadthing-request"
+    ],
     credentials: true,
   })
 )
@@ -37,6 +43,9 @@ app.use(express.json());
 
 //static folder for uploads
 app.use(express.urlencoded({ extended: true }));
+
+
+app.options("*", cors());
 
 app.use("/api/uploadthing", createRouteHandler({
   router: ourFileRouter
