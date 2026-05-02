@@ -7,22 +7,18 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "@google/genai": "^1.50.1",
-    "bcryptjs": "^3.0.3",
-    "cors": "^2.8.6",
-    "debug": "^4.4.3",
-    "dotenv": "^17.4.2",
-    "express": "^4.19.2",
-    "express-validator": "^7.3.2",
-    "jsonwebtoken": "^9.0.3",
+    "express": "4.19.2",
     "mongoose": "8.3.4",
-    "remark-gfm": "^4.0.1",
-    "uploadthing": "^7.7.4"
-  },
-  "overrides": {
-    "mongodb": "6.5.0"
+    "mongodb": "6.5.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "bcryptjs": "^3.0.3",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "@google/genai": "^1.50.1",
+    "express-validator": "^7.3.2"
   },
   "engines": {
-    "node": "24.x"
+    "node": "20.x"
   }
 }
